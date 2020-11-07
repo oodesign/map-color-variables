@@ -1,0 +1,23 @@
+{
+  "compatibleVersion": 3,
+  "bundleVersion": 1,
+  "commands": [
+    {
+      "name": "Map color variables",
+      "identifier": "mapColorVariables",
+      "script": "./mapColorVariables.js",
+      "handlers": {
+        "run": "onRun",
+        "actions": {
+          "Shutdown": "onShutdown"
+        }
+      }
+    }
+  ],
+  "menu": {
+    "title": "Map color variables",
+    "items": [
+      "mapColorVariables"
+    ]
+  }
+}
