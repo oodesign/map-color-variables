@@ -84,6 +84,67 @@ export function mapToColorVariables(createMissingVariables) {
     }
   });
 
+  const allLayerStyles = document.sharedLayerStyles
+  allLayerStyles.forEach(style => {
+    style.style.fills.concat(style.style.borders).forEach(item => {
+      if (item.fillType == 'Color') {
+        if (currentSwatches.has(item.color)) {
+          Helpers.clog("Fill/border in style " + style.name + " can be mapped to color variable " + currentSwatches.get(item.color).name);
+          item.color = currentSwatches.get(item.color).referencingColor;
+        }
+        else {
+          Helpers.clog("Fill/border in style " + style.name + " doesn't map to any color variable");
+          if (!missingSwatches.has(item.color)) {
+            var details = [];
+            details.push({
+              "style": style,
+              "item": item,
+              "type": Helpers.ItemType.layerStyle
+            });
+            missingSwatches.set(item.color, details);
+          }
+          else {
+            var details = missingSwatches.get(item.color);
+            details.push({
+              "style": style,
+              "item": item,
+              "type": Helpers.ItemType.layerStyle
+            });
+          }
+        }
+      }
+    })
+  })
+
+
+  const allTextStyles = document.sharedTextStyles
+  allTextStyles.forEach(style => {
+    if (currentSwatches.has(style.style.textColor)) {
+      Helpers.clog("Color in text style " + style.name + " can be mapped to color variable " + currentSwatches.get(style.style.textColor).name);
+      style.style.textColor = currentSwatches.get(style.style.textColor).referencingColor;
+    }
+    else {
+      Helpers.clog("Color in text style " + style.name + " doesn't map to any color variable");
+      if (!missingSwatches.has(style.style.textColor)) {
+        var details = [];
+        details.push({
+          "style": style,
+          "item": style.style,
+          "type": Helpers.ItemType.textStyle
+        });
+        missingSwatches.set(style.style.textColor, details);
+      }
+      else {
+        var details = missingSwatches.get(style.style.textColor);
+        details.push({
+          "style": style,
+          "item": style.style,
+          "type": Helpers.ItemType.textStyle
+        });
+      }
+    }
+  })
+
   if (createMissingVariables) {
     missingSwatches.forEach(function (value, key) {
       Helpers.clog("Adding missing swatch: " + key.toString());

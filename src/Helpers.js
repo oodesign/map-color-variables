@@ -3,8 +3,8 @@ var logsEnabled = true;
 export const ItemType = {
     shape: 'shape',
     text: 'text',
-    layerstyle: 'layerstyle',
-    textstyle: 'textstyle'
+    layerStyle: 'layerstyle',
+    textStyle: 'textstyle'
   }
 
 
