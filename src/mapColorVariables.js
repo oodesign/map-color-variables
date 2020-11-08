@@ -129,7 +129,6 @@ export function mapToColorVariables(createMissingVariables) {
         var details = [];
         details.push({
           "style": style,
-          "item": style.style,
           "type": Helpers.ItemType.textStyle
         });
         missingSwatches.set(style.style.textColor, details);
@@ -138,7 +137,6 @@ export function mapToColorVariables(createMissingVariables) {
         var details = missingSwatches.get(style.style.textColor);
         details.push({
           "style": style,
-          "item": style.style,
           "type": Helpers.ItemType.textStyle
         });
       }
@@ -160,6 +158,13 @@ export function mapToColorVariables(createMissingVariables) {
             break;
           case Helpers.ItemType.text:
             detail.layer.style.textColor = document.swatches[document.swatches.length - 1].referencingColor;
+            break;
+          case Helpers.ItemType.layerStyle:
+            detail.item.color = document.swatches[document.swatches.length - 1].referencingColor;
+            break;
+          case Helpers.ItemType.textStyle:
+            Helpers.clog("Will update text style: "+detail.style.name)
+            detail.style.style.textColor = document.swatches[document.swatches.length - 1].referencingColor;
             break;
         }
       });
