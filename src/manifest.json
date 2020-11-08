@@ -3,11 +3,22 @@
   "bundleVersion": 1,
   "commands": [
     {
-      "name": "Map color variables",
+      "name": "Map colors to color variables",
       "identifier": "mapColorVariables",
       "script": "./mapColorVariables.js",
       "handlers": {
-        "run": "onRun",
+        "run": "MapColors",
+        "actions": {
+          "Shutdown": "onShutdown"
+        }
+      }
+    },
+    {
+      "name": "Map, and create new variables if they don't exist",
+      "identifier": "mapColorVariablesAndCreateNewOnes",
+      "script": "./mapColorVariables.js",
+      "handlers": {
+        "run": "MapColorsAndCreateVariables",
         "actions": {
           "Shutdown": "onShutdown"
         }
@@ -17,7 +28,8 @@
   "menu": {
     "title": "Map color variables",
     "items": [
-      "mapColorVariables"
+      "mapColorVariables",
+      "mapColorVariablesAndCreateNewOnes"
     ]
   }
 }
