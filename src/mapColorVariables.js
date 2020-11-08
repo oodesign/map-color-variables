@@ -58,7 +58,6 @@ export function mapToColorVariables(createMissingVariables) {
           }
         }
       })
-    // Previous actions don't work for Text Layer colors that are colored using TextColor, so let's fix that:
     if (layer.style.textColor) {
       if (currentSwatches.has(layer.style.textColor)) {
         Helpers.clog("Text color in layer " + layer.name + " can be mapped to color variable " + currentSwatches.get(layer.style.textColor).name);
@@ -116,7 +115,6 @@ export function mapToColorVariables(createMissingVariables) {
     })
   })
 
-
   const allTextStyles = document.sharedTextStyles
   allTextStyles.forEach(style => {
     if (currentSwatches.has(style.style.textColor)) {
@@ -144,8 +142,11 @@ export function mapToColorVariables(createMissingVariables) {
   })
 
   if (createMissingVariables) {
+    Helpers.clog("Adding non-existing swatches");
+
     missingSwatches.forEach(function (value, key) {
-      Helpers.clog("Adding missing swatch: " + key.toString());
+      Helpers.clog("-- Adding swatch: " + key.toString());
+
       document.swatches.push(sketch.Swatch.from({
         name: automatedPrefix + key,
         color: key.toString()
@@ -154,16 +155,19 @@ export function mapToColorVariables(createMissingVariables) {
       value.forEach(function (detail) {
         switch (detail.type) {
           case Helpers.ItemType.shape:
+            Helpers.clog("---- Will update layer: " + detail.layer.name)
             detail.item.color = document.swatches[document.swatches.length - 1].referencingColor;
             break;
           case Helpers.ItemType.text:
+            Helpers.clog("---- Will update text layer: " + detail.layer.name)
             detail.layer.style.textColor = document.swatches[document.swatches.length - 1].referencingColor;
             break;
           case Helpers.ItemType.layerStyle:
+            Helpers.clog("---- Will update layer style: " + detail.style.name)
             detail.item.color = document.swatches[document.swatches.length - 1].referencingColor;
             break;
           case Helpers.ItemType.textStyle:
-            Helpers.clog("Will update text style: "+detail.style.name)
+            Helpers.clog("---- Will update text style: " + detail.style.name)
             detail.style.style.textColor = document.swatches[document.swatches.length - 1].referencingColor;
             break;
         }
