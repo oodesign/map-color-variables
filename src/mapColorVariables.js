@@ -20,6 +20,8 @@ export function MapColorsAndCreateVariables() {
 
 export function mapToColorVariables(createMissingVariables) {
 
+  var layersUpdated = 0, layerStylesUpdated = 0, textStylesUpdated = 0;
+
   const currentSwatches = new Map();
   const missingSwatches = new Map();
 
@@ -28,6 +30,7 @@ export function mapToColorVariables(createMissingVariables) {
   });
 
   const allLayers = sketch.find('*') // TODO: optimise this query: ShapePath, SymbolMaster, Text, SymbolInstance
+  const updatedLayersMap = new Map();
   allLayers.forEach(layer => {
     layer.style.fills
       .concat(layer.style.borders)
@@ -36,6 +39,7 @@ export function mapToColorVariables(createMissingVariables) {
         if (currentSwatches.has(item.color)) {
           Helpers.clog("Fill/border in layer " + layer.name + " can be mapped to color variable " + currentSwatches.get(item.color).name);
           item.color = currentSwatches.get(item.color).referencingColor;
+          if (!updatedLayersMap.has(layer)) updatedLayersMap.set(layer, true);
         }
         else {
           Helpers.clog("Fill/border in layer " + layer.name + " doesn't map to any color variable");
@@ -62,6 +66,7 @@ export function mapToColorVariables(createMissingVariables) {
       if (currentSwatches.has(layer.style.textColor)) {
         Helpers.clog("Text color in layer " + layer.name + " can be mapped to color variable " + currentSwatches.get(layer.style.textColor).name);
         layer.style.textColor = currentSwatches.get(layer.style.textColor).referencingColor;
+        if (!updatedLayersMap.has(layer)) updatedLayersMap.set(layer, true);
       } else {
         Helpers.clog("Text color in layer " + layer.name + " doesn't map to any color variable");
         if (!missingSwatches.has(layer.style.textColor)) {
@@ -83,13 +88,15 @@ export function mapToColorVariables(createMissingVariables) {
     }
   });
 
-  const allLayerStyles = document.sharedLayerStyles
+  const allLayerStyles = document.sharedLayerStyles;
+  const updatedStylesMap = new Map();
   allLayerStyles.forEach(style => {
     style.style.fills.concat(style.style.borders).forEach(item => {
       if (item.fillType == 'Color') {
         if (currentSwatches.has(item.color)) {
           Helpers.clog("Fill/border in style " + style.name + " can be mapped to color variable " + currentSwatches.get(item.color).name);
           item.color = currentSwatches.get(item.color).referencingColor;
+          if (!updatedStylesMap.has(style)) updatedStylesMap.set(style, true);
         }
         else {
           Helpers.clog("Fill/border in style " + style.name + " doesn't map to any color variable");
@@ -120,6 +127,7 @@ export function mapToColorVariables(createMissingVariables) {
     if (currentSwatches.has(style.style.textColor)) {
       Helpers.clog("Color in text style " + style.name + " can be mapped to color variable " + currentSwatches.get(style.style.textColor).name);
       style.style.textColor = currentSwatches.get(style.style.textColor).referencingColor;
+      if (!updatedStylesMap.has(style)) updatedStylesMap.set(style, true);
     }
     else {
       Helpers.clog("Color in text style " + style.name + " doesn't map to any color variable");
@@ -157,22 +165,37 @@ export function mapToColorVariables(createMissingVariables) {
           case Helpers.ItemType.shape:
             Helpers.clog("---- Will update layer: " + detail.layer.name)
             detail.item.color = document.swatches[document.swatches.length - 1].referencingColor;
+            if (!updatedLayersMap.has(detail.layer)) updatedLayersMap.set(detail.layer, true);
             break;
           case Helpers.ItemType.text:
             Helpers.clog("---- Will update text layer: " + detail.layer.name)
             detail.layer.style.textColor = document.swatches[document.swatches.length - 1].referencingColor;
+            if (!updatedLayersMap.has(detail.layer)) updatedLayersMap.set(detail.layer, true);
             break;
           case Helpers.ItemType.layerStyle:
             Helpers.clog("---- Will update layer style: " + detail.style.name)
             detail.item.color = document.swatches[document.swatches.length - 1].referencingColor;
+            if (!updatedStylesMap.has(detail.style)) updatedLayersMap.set(detail.style, true);
             break;
           case Helpers.ItemType.textStyle:
             Helpers.clog("---- Will update text style: " + detail.style.name)
             detail.style.style.textColor = document.swatches[document.swatches.length - 1].referencingColor;
+            if (!updatedStylesMap.has(detail.style)) updatedLayersMap.set(detail.style, true);
             break;
         }
       });
     });
+  }
+
+  Helpers.clog("Updated layers: " + updatedLayersMap.size)
+  Helpers.clog("Updated styles: " + updatedStylesMap.size)
+  Helpers.clog("Added color vars: " + missingSwatches.size)
+
+  if (createMissingVariables) {
+    UI.message("Cool! We updated " + updatedLayersMap.size + " layers, " + updatedStylesMap.size + " styles, and added " + missingSwatches.size + " color variables");
+  }
+  else {
+    UI.message("Cool! We updated " + updatedLayersMap.size + " layers, and " + updatedStylesMap.size + " styles");
   }
 
 }

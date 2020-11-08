@@ -1,4 +1,4 @@
-var logsEnabled = true;
+var logsEnabled = false;
 
 export const ItemType = {
     shape: 'shape',
