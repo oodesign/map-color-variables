@@ -149,11 +149,12 @@ export function mapToColorVariables(createMissingVariables) {
     }
   })
 
+
   if (createMissingVariables) {
     Helpers.clog("Adding non-existing swatches");
 
     missingSwatches.forEach(function (value, key) {
-      Helpers.clog("-- Adding swatch: " + key.toString());
+      Helpers.clog("-- Adding swatch: " + key.toString() + ", used in " + value.length + " places");
 
       document.swatches.push(sketch.Swatch.from({
         name: automatedPrefix + key,
@@ -175,12 +176,12 @@ export function mapToColorVariables(createMissingVariables) {
           case Helpers.ItemType.layerStyle:
             Helpers.clog("---- Will update layer style: " + detail.style.name)
             detail.item.color = document.swatches[document.swatches.length - 1].referencingColor;
-            if (!updatedStylesMap.has(detail.style)) updatedLayersMap.set(detail.style, true);
+            if (!updatedStylesMap.has(detail.style)) updatedStylesMap.set(detail.style, true);
             break;
           case Helpers.ItemType.textStyle:
             Helpers.clog("---- Will update text style: " + detail.style.name)
             detail.style.style.textColor = document.swatches[document.swatches.length - 1].referencingColor;
-            if (!updatedStylesMap.has(detail.style)) updatedLayersMap.set(detail.style, true);
+            if (!updatedStylesMap.has(detail.style)) updatedStylesMap.set(detail.style, true);
             break;
         }
       });
